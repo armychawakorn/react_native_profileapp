@@ -304,7 +304,7 @@ export const showBookAlerts = {
   },
 
   // Book created
-  bookCreated: (title) => {
+  createSuccess: (title) => {
     showSuccessAlert(
       "เพิ่มหนังสือสำเร็จ",
       `หนังสือ "${title}" ถูกเพิ่มเข้าระบบแล้ว`
@@ -312,7 +312,7 @@ export const showBookAlerts = {
   },
 
   // Book updated
-  bookUpdated: (title) => {
+  updateSuccess: (title) => {
     showSuccessAlert(
       "อัปเดตหนังสือสำเร็จ",
       `หนังสือ "${title}" ได้รับการอัปเดตแล้ว`
@@ -320,7 +320,7 @@ export const showBookAlerts = {
   },
 
   // Book deleted
-  bookDeleted: (title) => {
+  deleteSuccess: (title) => {
     showSuccessAlert(
       "ลบหนังสือสำเร็จ",
       `หนังสือ "${title}" ถูกลบออกจากระบบแล้ว`
@@ -333,6 +333,35 @@ export const showBookAlerts = {
       "ยืนยันการลบ",
       `คุณต้องการลบหนังสือ "${title}" หรือไม่?`,
       onConfirm
+    );
+  },
+
+  // Search results
+  searchResults: (count, query) => {
+    if (count === 0) {
+      showInfoAlert(
+        "ไม่พบผลการค้นหา",
+        `ไม่พบหนังสือที่ตรงกับ "${query}"`
+      );
+    } else {
+      showInfoAlert(
+        "พบผลการค้นหา",
+        `พบหนังสือ ${count} เล่มที่ตรงกับ "${query}"`
+      );
+    }
+  },
+
+  // Filter applied
+  filterApplied: (count, filters) => {
+    const filterText = [];
+    if (filters.genre) filterText.push(`หมวดหมู่: ${filters.genre}`);
+    if (filters.search) filterText.push(`คำค้นหา: ${filters.search}`);
+    
+    const filtersString = filterText.join(', ');
+    
+    showInfoAlert(
+      "กรองข้อมูลแล้ว",
+      `พบหนังสือ ${count} เล่ม (${filtersString})`
     );
   }
 };

@@ -149,6 +149,44 @@ const Settings = () => {
           </View>
         </View>
 
+        {/* Books Management Section */}
+        <View style={dynamicStyles.card}>
+          <Text style={dynamicStyles.sectionTitle}>📚 จัดการหนังสือ</Text>
+          
+          <TouchableOpacity 
+            style={dynamicStyles.settingItem}
+            onPress={() => router.push('/book')}
+          >
+            <Text style={dynamicStyles.settingLabel}>📖 ดูหนังสือทั้งหมด</Text>
+            <Text style={[dynamicStyles.settingLabel, { color: theme.secondary, textAlign: 'right', flex: 0 }]}>
+              →
+            </Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={dynamicStyles.settingItem}
+            onPress={() => router.push('/my-books')}
+          >
+            <Text style={dynamicStyles.settingLabel}>📝 หนังสือของฉัน</Text>
+            <Text style={[dynamicStyles.settingLabel, { color: theme.secondary, textAlign: 'right', flex: 0 }]}>
+              →
+            </Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={[dynamicStyles.settingItem, { borderBottomWidth: 0 }]}
+            onPress={() => router.push({
+              pathname: '/book-form',
+              params: { mode: 'create' }
+            })}
+          >
+            <Text style={dynamicStyles.settingLabel}>➕ เพิ่มหนังสือใหม่</Text>
+            <Text style={[dynamicStyles.settingLabel, { color: theme.secondary, textAlign: 'right', flex: 0 }]}>
+              →
+            </Text>
+          </TouchableOpacity>
+        </View>
+
         <View style={dynamicStyles.card}>
           <Text style={dynamicStyles.sectionTitle}>ℹ️ About</Text>
           <View style={dynamicStyles.settingItem}>
