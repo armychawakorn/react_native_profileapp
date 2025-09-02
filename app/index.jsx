@@ -1,10 +1,20 @@
 import { Text, View, StyleSheet, Image, ScrollView, SafeAreaView, TouchableOpacity } from "react-native";
 import { useRouter } from 'expo-router';
 import { useTheme } from "../contexts/ThemeContext";
+import { useAuth } from "../contexts/AuthContext";
+import { showAuthAlerts } from '../utils/alertUtils';
 
 const Home = () => {
   const { theme } = useTheme();
+  const { user, logout } = useAuth();
   const router = useRouter();
+
+  const handleLogout = () => {
+    showAuthAlerts.logoutConfirm(() => {
+      logout();
+      router.replace('/signin');
+    });
+  };
 
   const dynamicStyles = StyleSheet.create({
     container: {
@@ -146,6 +156,10 @@ const Home = () => {
     },
   });
 
+  // แสดงชื่อผู้ใช้จาก API หรือใช้ชื่อเดิมถ้าไม่มีข้อมูล
+  const displayName = user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username : 'ชวกร เนืองภา';
+  const displayEmail = user ? user.email : 'Chawakorn.n@kkumail.com';
+
   return (
     <SafeAreaView style={dynamicStyles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -156,8 +170,13 @@ const Home = () => {
               style={styles.profileImage}
             />
           </View>
-          <Text style={dynamicStyles.name}>ชวกร เนืองภา</Text>
-          <Text style={dynamicStyles.title}>นักศึกษาวิทยาการคอมพิวเตอร์ ปี 4</Text>
+          <Text style={dynamicStyles.name}>{displayName}</Text>
+          <Text style={dynamicStyles.title}>
+            {user ? 'ผู้ใช้ระบบ' : 'นักศึกษาวิทยาการคอมพิวเตอร์ ปี 4'}
+          </Text>
+          {user && (
+            <Text style={dynamicStyles.title}>เข้าสู่ระบบแล้ว</Text>
+          )}
         </View>
 
         {/* Navigation Buttons */}
@@ -168,13 +187,25 @@ const Home = () => {
               style={dynamicStyles.navButton}
               onPress={() => router.push('/about')}
             >
-              <Text style={dynamicStyles.navButtonText}>� รายวิชา</Text>
+              <Text style={dynamicStyles.navButtonText}>📚 รายวิชา</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={dynamicStyles.navButton}
+              onPress={() => router.push('/book')}
+            >
+              <Text style={dynamicStyles.navButtonText}>📖 หนังสือ</Text>
             </TouchableOpacity>
             <TouchableOpacity 
               style={dynamicStyles.navButton}
               onPress={() => router.push('/settings')}
             >
               <Text style={dynamicStyles.navButtonText}>⚙️ Settings</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[dynamicStyles.navButton, { backgroundColor: theme.accent }]}
+              onPress={handleLogout}
+            >
+              <Text style={dynamicStyles.navButtonText}>🚪 ออกจากระบบ</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -184,8 +215,20 @@ const Home = () => {
           
           <View style={dynamicStyles.infoRow}>
             <Text style={dynamicStyles.label}>ชื่อ-นามสกุล:</Text>
-            <Text style={dynamicStyles.value}>ชวกร เนืองภา</Text>
+            <Text style={dynamicStyles.value}>{displayName}</Text>
           </View>
+          
+          <View style={dynamicStyles.infoRow}>
+            <Text style={dynamicStyles.label}>อีเมล:</Text>
+            <Text style={dynamicStyles.value}>{displayEmail}</Text>
+          </View>
+          
+          {user && (
+            <View style={dynamicStyles.infoRow}>
+              <Text style={dynamicStyles.label}>ชื่อผู้ใช้:</Text>
+              <Text style={dynamicStyles.value}>{user.username}</Text>
+            </View>
+          )}
           
           <View style={dynamicStyles.infoRow}>
             <Text style={dynamicStyles.label}>สาขา:</Text>
@@ -209,7 +252,7 @@ const Home = () => {
           
           <View style={dynamicStyles.infoRow}>
             <Text style={dynamicStyles.label}>สถานะ:</Text>
-            <Text style={dynamicStyles.value}>เปิดรับงาน</Text>
+            <Text style={dynamicStyles.value}>{user ? 'ออนไลน์' : 'เปิดรับงาน'}</Text>
           </View>
         </View>
 
@@ -283,7 +326,7 @@ const Home = () => {
           
           <View style={styles.contactItem}>
             <Text style={styles.contactIcon}>📧</Text>
-            <Text style={dynamicStyles.contactText}>Chawakorn.n@kkumail.com</Text>
+            <Text style={dynamicStyles.contactText}>{displayEmail}</Text>
           </View>
           
           <View style={styles.contactItem}>

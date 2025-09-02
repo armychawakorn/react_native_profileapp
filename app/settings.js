@@ -1,9 +1,21 @@
 import React from 'react';
-import { Text, View, StyleSheet, ScrollView, SafeAreaView, Switch } from 'react-native';
+import { Text, View, StyleSheet, ScrollView, SafeAreaView, Switch, TouchableOpacity } from 'react-native';
 import { useTheme } from '../contexts/ThemeContext';
+import { useAuth } from '../contexts/AuthContext';
+import { useRouter } from 'expo-router';
+import { showAuthAlerts } from '../utils/alertUtils';
 
 const Settings = () => {
   const { theme, isDarkMode, toggleTheme } = useTheme();
+  const { user, logout } = useAuth();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    showAuthAlerts.logoutConfirm(() => {
+      logout();
+      router.replace('/signin');
+    });
+  };
 
   const dynamicStyles = StyleSheet.create({
     container: {
@@ -157,6 +169,27 @@ const Settings = () => {
               React Native + Expo
             </Text>
           </View>
+          {user && (
+            <View style={dynamicStyles.settingItem}>
+              <Text style={dynamicStyles.settingLabel}>ผู้ใช้งาน</Text>
+              <Text style={[dynamicStyles.settingLabel, { textAlign: 'right', flex: 1 }]}>
+                {user.username}
+              </Text>
+            </View>
+          )}
+        </View>
+
+        {/* Logout Section */}
+        <View style={dynamicStyles.card}>
+          <Text style={dynamicStyles.sectionTitle}>🔐 บัญชีผู้ใช้</Text>
+          <TouchableOpacity 
+            style={[dynamicStyles.settingItem, { borderBottomWidth: 0, paddingVertical: 20 }]}
+            onPress={handleLogout}
+          >
+            <Text style={[dynamicStyles.settingLabel, { color: theme.accent, fontWeight: 'bold' }]}>
+              🚪 ออกจากระบบ
+            </Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
