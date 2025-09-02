@@ -20,7 +20,7 @@ import { getBooksUrl } from '../config/api';
 import { Ionicons } from '@expo/vector-icons';
 
 const BookForm = () => {
-  const { mode, bookId } = useLocalSearchParams(); // mode: 'create' or 'edit'
+  const { mode, bookId, onSuccess } = useLocalSearchParams(); // เพิ่ม onSuccess callback
   const router = useRouter();
   const { theme } = useTheme();
   const { authenticatedFetch } = useAuth();
@@ -162,16 +162,21 @@ const BookForm = () => {
       const result = handleApiResponse(response, data, {
         successTitle: isEditMode ? "แก้ไขหนังสือสำเร็จ" : "สร้างหนังสือสำเร็จ",
         errorTitle: isEditMode ? "แก้ไขหนังสือไม่สำเร็จ" : "สร้างหนังสือไม่สำเร็จ",
-        showSuccessMessage: true
+        showSuccessMessage: false // ปิดการแสดงข้อความจาก handleApiResponse
       });
 
       if (result.success) {
+        // แสดงข้อความสำเร็จเฉพาะที่นี่
         if (isEditMode) {
           showBookAlerts.updateSuccess(formData.title);
         } else {
           showBookAlerts.createSuccess(formData.title);
         }
-        router.back();
+        
+        // รอสักครู่แล้วค่อย navigate กลับเพื่อให้ผู้ใช้เห็นข้อความ
+        setTimeout(() => {
+          router.back();
+        }, 1500);
       }
     } catch (error) {
       if (error.name === 'TypeError' || error.name === 'AbortError') {

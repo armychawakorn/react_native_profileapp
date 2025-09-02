@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { handleApiResponse, handleNetworkError, showBookAlerts } from '../utils/alertUtils';
 import { getBooksUrl, CONFIG } from '../config/api';
 import { Ionicons } from '@expo/vector-icons';
@@ -28,6 +28,14 @@ const MyBooks = () => {
   const { theme } = useTheme();
   const { authenticatedFetch, user } = useAuth();
   const router = useRouter();
+
+  // ใช้ useFocusEffect เพื่อ refresh ข้อมูลเมื่อกลับมาหน้านี้
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log("MyBooks screen focused - refreshing data");
+      onRefresh();
+    }, [])
+  );
 
   // function to fetch user's books
   const fetchMyBooks = async (pageNum = 1, isRefresh = false) => {
@@ -79,7 +87,8 @@ const MyBooks = () => {
 
   useEffect(() => {
     console.log("MyBooks component mounted");
-    fetchMyBooks();
+    // ลบการ fetch ออกจาก useEffect เพราะใช้ useFocusEffect แทน
+    // fetchMyBooks();
   }, []);
 
   const onRefresh = () => {

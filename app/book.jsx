@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { handleApiResponse, handleNetworkError, showBookAlerts } from '../utils/alertUtils';
 import { getBooksUrl, CONFIG } from '../config/api';
 import { Ionicons } from '@expo/vector-icons';
@@ -33,6 +33,14 @@ const Book = () => {
   const { theme } = useTheme();
   const { authenticatedFetch, user } = useAuth();
   const router = useRouter();
+
+  // ใช้ useFocusEffect เพื่อ refresh ข้อมูลเมื่อกลับมาหน้านี้
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log("Books screen focused - refreshing data");
+      onRefresh();
+    }, [])
+  );
 
   // function to fetch book data
   const bookData = async (pageNum = 1, isRefresh = false, search = '', genre = '') => {
@@ -94,7 +102,8 @@ const Book = () => {
   useEffect(() => {
     console.log("Book component mounted");
     fetchGenres();
-    bookData();
+    // ลบการ fetch books ออกจาก useEffect เพราะใช้ useFocusEffect แทน
+    // bookData();
   }, []);
 
   const fetchGenres = async () => {
@@ -182,7 +191,7 @@ const Book = () => {
       const result = handleApiResponse(response, data, {
         successTitle: "ลบหนังสือสำเร็จ",
         errorTitle: "ลบหนังสือไม่สำเร็จ",
-        showSuccessMessage: true
+        showSuccessMessage: false // ปิดการแสดงข้อความจาก handleApiResponse
       });
 
       if (result.success) {

@@ -88,12 +88,15 @@ const BookDetail = () => {
       const result = handleApiResponse(response, data, {
         successTitle: "ลบหนังสือสำเร็จ",
         errorTitle: "ลบหนังสือไม่สำเร็จ",
-        showSuccessMessage: true
+        showSuccessMessage: false // ปิดการแสดงข้อความจาก handleApiResponse
       });
 
       if (result.success) {
         showBookAlerts.deleteSuccess(book.title);
-        router.back();
+        // รอสักครู่แล้วค่อย navigate กลับเพื่อให้ผู้ใช้เห็นข้อความ
+        setTimeout(() => {
+          router.back();
+        }, 1500);
       }
     } catch (error) {
       if (error.name === 'TypeError' || error.name === 'AbortError') {
