@@ -3,11 +3,13 @@ import { Text, View, StyleSheet, ScrollView, SafeAreaView, Switch, TouchableOpac
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'expo-router';
+import { useLocalAuth } from '../contexts/LocalAuthContext';
 import { showAuthAlerts } from '../utils/alertUtils';
 
 const Settings = () => {
   const { theme, isDarkMode, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
+  const { enabled: localAuthEnabled, setEnabled: setLocalAuthEnabled, supported, enrolled, refreshDeviceStatus, loading: localAuthLoading } = useLocalAuth();
   const router = useRouter();
 
   const handleLogout = () => {
@@ -92,6 +94,11 @@ const Settings = () => {
       alignItems: 'center',
       marginVertical: 10,
     },
+    supportText: {
+      fontSize: 12,
+      color: theme.textSecondary,
+      marginTop: 6,
+    },
   });
 
   return (
@@ -146,6 +153,39 @@ const Settings = () => {
                 <Text style={dynamicStyles.colorLabel}>Surface</Text>
               </View>
             </View>
+          </View>
+        </View>
+
+        {/* Local Authentication Section */}
+        <View style={dynamicStyles.card}>
+          <Text style={dynamicStyles.sectionTitle}>🔐 Local Authentication</Text>
+          <View style={dynamicStyles.settingItem}>
+            <View style={{ flex: 1 }}>
+              <Text style={dynamicStyles.settingLabel}>
+                ใช้ Touch ID / Face ID / รหัสอุปกรณ์
+              </Text>
+              <Text style={dynamicStyles.settingDescription}>
+                ล็อคหน้าจอแอปเมื่อกลับมาใช้งานอีกครั้ง (Foreground)
+              </Text>
+              {!localAuthLoading && (
+                <Text style={dynamicStyles.supportText}>
+                  สถานะอุปกรณ์: {supported ? (enrolled ? 'พร้อมใช้งาน' : 'ยังไม่ได้ลงทะเบียนไบโอเมตริกส์/รหัส') : 'ไม่รองรับ'}
+                </Text>
+              )}
+            </View>
+            <Switch
+              value={localAuthEnabled}
+              onValueChange={async (v) => {
+                await refreshDeviceStatus();
+                if (!supported) return; // ignore if unsupported
+                if (v && !enrolled) return; // cannot enable without enrollment
+                await setLocalAuthEnabled(v);
+              }}
+              disabled={!supported || (!enrolled && !localAuthEnabled)}
+              trackColor={{ false: '#767577', true: theme.secondary }}
+              thumbColor={localAuthEnabled ? '#fff' : '#f4f3f4'}
+              ios_backgroundColor="#3e3e3e"
+            />
           </View>
         </View>
 

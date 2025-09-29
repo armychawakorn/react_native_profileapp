@@ -1,6 +1,6 @@
 {
   "expo": {
-    "scheme": "profile_app",
+    "scheme": "profileapp",
     "name": "profile_app",
     "slug": "profile_app",
     "version": "1.0.0",
@@ -27,7 +27,8 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-secure-store"
     ]
   }
 }

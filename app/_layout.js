@@ -1,6 +1,9 @@
-import { Stack } from "expo-router";
+import { Stack, usePathname } from "expo-router";
 import { ThemeProvider, useTheme } from "../contexts/ThemeContext";
 import { AuthProvider, useAuth } from "../contexts/AuthContext";
+import { LocalAuthProvider } from "../contexts/LocalAuthContext";
+import { PinAuthProvider } from "../contexts/PinAuthContext";
+import LocalAuthGate from "../components/LocalAuthGate";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
 import LoadingScreen from "../components/LoadingScreen";
@@ -9,21 +12,26 @@ function AppStack() {
   const { theme } = useTheme();
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
-    if (!isLoading) {
-      if (!isAuthenticated) {
-        router.replace('/signin');
+    if (isLoading) return;
+    if (!isAuthenticated) {
+      // If unauthenticated, start at local-auth screen unless already on auth routes
+      if (pathname !== '/local-auth' && pathname !== '/signin' && pathname !== '/signup') {
+        router.replace('/local-auth');
       }
     }
-  }, [isAuthenticated, isLoading]);
+  }, [isAuthenticated, isLoading, pathname]);
 
   if (isLoading) {
     return <LoadingScreen />;
   }
 
   return (
-    <Stack
+    <>
+      <LocalAuthGate />
+      <Stack
       screenOptions={{
         headerStyle: {
           backgroundColor: theme.headerBackground,
@@ -39,6 +47,13 @@ function AppStack() {
         options={{ 
           title: "Profile",
           headerShown: false 
+        }} 
+      />
+      <Stack.Screen 
+        name="local-auth" 
+        options={{ 
+          title: "ยืนยันตัวตน",
+          headerShown: false
         }} 
       />
       <Stack.Screen 
@@ -74,7 +89,8 @@ function AppStack() {
           title: "หนังสือ"
         }} 
       />
-    </Stack>
+      </Stack>
+    </>
   );
 }
 
@@ -82,7 +98,11 @@ export default function Layout() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <AppStack />
+        <PinAuthProvider>
+          <LocalAuthProvider>
+            <AppStack />
+          </LocalAuthProvider>
+        </PinAuthProvider>
       </AuthProvider>
     </ThemeProvider>
   );
